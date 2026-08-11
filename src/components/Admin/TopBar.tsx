@@ -28,11 +28,11 @@ export default function TopBar({ collapsed, onToggle }: TopBarProps) {
 
         <div className="user-profile font-sans">
           <div className="user-text">
-            <span className="user-name">Petugas Komando</span>
+            <span className="user-name">Hellyoshaqiqie</span>
             <span className="user-role">SMN Control Tower</span>
           </div>
           <div className="user-avatar">
-            <span>SM</span>
+            <span>HQ</span>
           </div>
         </div>
       </div>
