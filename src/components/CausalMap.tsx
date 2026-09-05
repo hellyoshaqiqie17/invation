@@ -64,10 +64,11 @@ export default function CausalMap() {
     <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-xl space-y-8">
       {/* Header */}
       <div>
-        <span className="text-xs font-mono font-bold text-emerald-600 uppercase tracking-widest bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
-          DIAGRAM AKAR MASALAH TERHUBUNG
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-emerald-50 border border-emerald-200 text-xs font-medium text-emerald-800">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+          Pemetaan Kausalitas Masalah
         </span>
-        <h3 className="text-2xl font-extrabold text-slate-900 mt-3">
+        <h3 className="text-2xl font-extrabold text-slate-900 mt-2">
           The Problems Are Connected.
         </h3>
         <p className="text-slate-600 text-sm mt-1">
@@ -89,7 +90,7 @@ export default function CausalMap() {
                   : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100 hover:border-slate-300"
               }`}
             >
-              <span className={`text-[9px] font-bold px-2 py-0.5 rounded font-mono block w-fit mb-2 ${
+              <span className={`text-[10px] font-semibold px-2 py-0.5 rounded block w-fit mb-2 ${
                 isActive ? "bg-white/20 text-white" : "bg-slate-200 text-slate-700"
               }`}>
                 {chain.category}
@@ -103,10 +104,10 @@ export default function CausalMap() {
       {/* Visual Chain Node Flow */}
       <div className="bg-slate-900 rounded-2xl p-6 text-white border border-slate-800 space-y-6">
         <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-          <span className="text-xs font-mono text-emerald-400 font-bold">
-            ALUR CAUSAL LINK — {selectedChain.title.toUpperCase()}
+          <span className="text-xs text-emerald-400 font-semibold">
+            Alur Kausalitas: {selectedChain.title}
           </span>
-          <span className="text-[10px] text-slate-400 font-mono">Interactive Node Diagram</span>
+          <span className="text-xs text-slate-400">Diagram Alir Sebab-Akibat</span>
         </div>
 
         {/* Nodes */}
@@ -118,7 +119,7 @@ export default function CausalMap() {
                   ? "bg-red-950/80 border-red-500/80 text-red-200 font-bold"
                   : "bg-slate-800 border-slate-700 text-slate-200 font-medium"
               }`}>
-                <span className="text-[9px] font-mono text-slate-400 block mb-0.5">Step {idx + 1}</span>
+                <span className="text-[10px] text-slate-400 block mb-0.5">Langkah {idx + 1}</span>
                 <span className="text-xs">{nodeText}</span>
               </div>
               {idx < selectedChain.nodes.length - 1 && (

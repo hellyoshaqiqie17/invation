@@ -77,8 +77,9 @@ export default function MachineRetrofitSvg() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-6">
         <div>
-          <span className="text-xs font-mono font-bold text-blue-400 uppercase tracking-widest bg-blue-950 px-3 py-1 rounded-full border border-blue-800">
-            ARSITEKTUR RETROFIT RETROFIT-FIRST
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-blue-950/70 border border-blue-800/80 text-xs font-medium text-blue-400">
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
+            Arsitektur Retrofit-First
           </span>
           <h3 className="text-2xl font-extrabold text-slate-100 mt-2">
             Don't Replace the Factory. Retrofit It.
@@ -88,9 +89,9 @@ export default function MachineRetrofitSvg() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2 bg-slate-800 p-2 rounded-xl border border-slate-700 text-xs text-slate-300 font-mono">
-          <span className="h-2.5 w-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-          <span>Pilot Line Retrofit Cost: &lt; Rp140 Juta / Mesin</span>
+        <div className="flex items-center gap-2 bg-slate-800 p-2.5 rounded-xl border border-slate-700 text-xs text-slate-300">
+          <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>Biaya Retrofit Pilot: &lt; <strong className="font-mono text-white">Rp 140 Juta / Mesin</strong></span>
         </div>
       </div>
 
@@ -148,7 +149,7 @@ export default function MachineRetrofitSvg() {
             <line x1="90" y1="204" x2="210" y2="45" stroke="#10b981" strokeWidth="1.5" strokeDasharray="3 3" />
             <line x1="450" y1="224" x2="330" y2="45" stroke="#f59e0b" strokeWidth="1.5" strokeDasharray="3 3" />
           </svg>
-          <span className="text-[10px] text-slate-500 font-mono mt-2">Diagram Retrofit IoT Mesin Industri (Klik icon sensor untuk detail)</span>
+          <span className="text-xs text-slate-500 mt-2">Diagram Retrofit IoT Mesin Industri (Klik icon sensor untuk detail)</span>
         </div>
 
         {/* Right Detail Card (5 cols) */}
@@ -158,24 +159,24 @@ export default function MachineRetrofitSvg() {
               <selectedSensor.icon className="w-6 h-6" />
             </div>
             <div>
-              <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400">DETAIL SENSOR TERPILIH</span>
-              <h4 className="text-base font-bold text-white">{selectedSensor.name}</h4>
+              <span className="text-xs font-medium text-slate-400">Detail Sensor Terpilih</span>
+              <h4 className="text-base font-bold text-white mt-0.5">{selectedSensor.name}</h4>
             </div>
           </div>
 
           <div className="space-y-3 text-xs">
             <div>
-              <span className="text-slate-400 block text-[10px]">Tipe Hardware & Protokol:</span>
+              <span className="text-slate-400 block text-xs">Tipe Hardware & Protokol:</span>
               <span className="font-mono text-emerald-400 font-semibold">{selectedSensor.type} ({selectedSensor.protocol})</span>
             </div>
 
             <div>
-              <span className="text-slate-400 block text-[10px]">Fungsi Pemantauan:</span>
+              <span className="text-slate-400 block text-xs">Fungsi Pemantauan:</span>
               <p className="text-slate-300 leading-relaxed mt-0.5">{selectedSensor.desc}</p>
             </div>
 
             <div className="bg-slate-900/80 p-3 rounded-xl border border-slate-700">
-              <span className="text-slate-400 block text-[10px] font-bold text-blue-400">Nilai Tambah & Nilai Dampak:</span>
+              <span className="text-blue-400 block text-xs font-semibold">Nilai Tambah & Nilai Dampak:</span>
               <p className="text-slate-200 mt-1 leading-relaxed">{selectedSensor.impact}</p>
             </div>
           </div>
@@ -186,10 +187,10 @@ export default function MachineRetrofitSvg() {
       {/* Live Health Status Demo Matrix */}
       <div className="border-t border-slate-800 pt-6">
         <div className="flex items-center justify-between mb-4">
-          <h4 className="text-xs font-mono font-bold text-slate-300 uppercase tracking-wider">
-            DEMO STREAM STATUS KESEHATAN MESIN (PREDICTIVE MAINTENANCE PIPELINE)
+          <h4 className="text-xs font-semibold text-slate-300">
+            Demo Stream Status Kesehatan Mesin (Predictive Maintenance Pipeline)
           </h4>
-          <span className="text-[10px] bg-slate-800 text-slate-400 px-2.5 py-1 rounded font-mono">Illustrative Demo Data</span>
+          <span className="text-xs text-slate-400 bg-slate-800 px-2.5 py-1 rounded-md border border-slate-700">Data Ilustratif Prototipe</span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">

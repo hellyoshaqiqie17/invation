@@ -27,7 +27,7 @@ export default function AdminLayout({
           margin: 0;
           padding: 0;
           overflow-x: hidden;
-          background: #f8fafc;
+          background: var(--color-canvas);
         }
 
         .admin-layout {
@@ -36,7 +36,7 @@ export default function AdminLayout({
           width: 100vw;
           overflow: hidden;
           position: relative;
-          background: #f8fafc;
+          background: var(--color-canvas);
         }
 
         .main-content {
@@ -68,7 +68,7 @@ export default function AdminLayout({
           min-height: 0;
           overflow-y: auto;
           overflow-x: hidden;
-          background: #f8fafc;
+          background: var(--color-canvas);
         }
 
         @media (max-width: 1024px) {

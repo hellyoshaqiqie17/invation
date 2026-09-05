@@ -16,16 +16,17 @@ export default function HeroVisualizer() {
     <div className="bg-slate-900 rounded-3xl p-6 sm:p-8 text-white border border-slate-800 shadow-2xl relative overflow-hidden">
       {/* Background glow effects */}
       <div className={`absolute -top-24 -left-24 w-72 h-72 rounded-full blur-[90px] transition-all duration-700 pointer-events-none ${
-        stage === 0 ? "bg-amber-600/20" : stage === 1 ? "bg-blue-600/25" : "bg-emerald-500/30"
+        stage === 0 ? "bg-amber-600/20" : stage === 1 ? "bg-[#4B6BFB]/25" : "bg-emerald-500/30"
       }`} />
       
       {/* Top Controls */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-slate-800">
         <div>
-          <span className="text-[10px] font-mono font-semibold tracking-widest text-emerald-400 uppercase">
-            SIMULASI INTERAKTIF EVOLUSI PABRIK
+          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-400">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+            Simulasi Interaktif Evolusi Pabrik
           </span>
-          <h3 className="text-lg font-bold text-slate-100 mt-0.5">
+          <h3 className="text-lg font-bold text-slate-100 mt-1">
             {stageTitles[stage]}
           </h3>
         </div>

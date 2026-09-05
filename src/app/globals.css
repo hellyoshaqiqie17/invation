@@ -1,56 +1,131 @@
+@import "https://api.fontshare.com/v2/css?f[]=satoshi@900,700,500,400,300&display=swap";
+@import "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap";
 @import "tailwindcss";
 
 :root {
-  --color-canvas: #f8fafc;
-  --color-foreground: #0f172a;
-  --color-muted: #64748b;
-  --color-border: #e2e8f0;
-  --color-accent: #4b6bfb;
-  --color-accent-hover: #3b5beb;
-  --color-accent-light: #eef2ff;
-  --color-shell: #f1f5f9;
+  /* Modern minimalist color palette matching C:/pkm */
+  --color-canvas: #FAFBFC;
+  --color-foreground: #0F172A;
+  --color-muted: #94A3B8;
+  --color-shell: #F1F5F9;
+  --color-card: #ffffff;
+  --color-surface: #E2E8F0;
+  --color-surface-nested: #CBD5E1;
+  --color-border: #E2E8F0;
+
+  /* Accent colors */
+  --color-accent: #4B6BFB;
+  --color-accent-light: #EEF2FF;
+  --color-accent-hover: #3B5BEB;
+
+  /* Semantic colors */
+  --color-success: #10B981;
+  --color-success-light: #ECFDF5;
+  --color-warning: #F59E0B;
+  --color-warning-light: #FFFBEB;
+  --color-danger: #EF4444;
+  --color-danger-light: #FEF2F2;
+
+  /* Elevated shadows */
+  --shadow-elevated: 0 1px 3px rgba(0,0,0,0.04), 0 6px 16px rgba(0,0,0,0.06);
+  --shadow-card: 0 1px 2px rgba(0,0,0,0.03), 0 1px 6px rgba(0,0,0,0.04);
+  --shadow-lg: 0 4px 6px rgba(0,0,0,0.04), 0 10px 24px rgba(0,0,0,0.08);
 }
 
+@theme {
+  --font-sans: 'Satoshi', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+
+  /* Custom theme tokens */
+  --color-canvas: var(--color-canvas);
+  --color-foreground: var(--color-foreground);
+  --color-muted: var(--color-muted);
+  --color-shell: var(--color-shell);
+  --color-card: var(--color-card);
+  --color-surface: var(--color-surface);
+  --color-surface-nested: var(--color-surface-nested);
+  --color-border: var(--color-border);
+  --color-accent: var(--color-accent);
+  --color-accent-light: var(--color-accent-light);
+  --color-accent-hover: var(--color-accent-hover);
+}
+
+/* Base styles matching C:/pkm */
 body {
-  background-color: var(--color-canvas);
-  color: var(--color-foreground);
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  background-color: var(--color-canvas) !important;
+  color: var(--color-foreground) !important;
+  font-family: 'Satoshi', ui-sans-serif, system-ui, sans-serif;
   overflow-x: hidden;
 }
 
-/* Background Grid Pattern matching WearOcean */
+/* Background dotted grid pattern matching C:/pkm */
 .bg-grid-pattern {
-  background-size: 32px 32px;
-  background-image: radial-gradient(circle, #cbd5e1 1.5px, transparent 1.5px);
+  background-image: radial-gradient(var(--color-border) 1.2px, transparent 1.2px);
+  background-size: 24px 24px;
 }
 
-/* Custom Scrollbar */
+/* Custom Scrollbars matching C:/pkm */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
-
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: transparent;
 }
-
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
+  background: var(--color-surface);
+  border-radius: 99px;
 }
-
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: var(--color-muted);
 }
 
-/* KPI Responsive Grid */
+/* Component utility classes */
+.btn-primary {
+  background: var(--color-accent);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(75, 107, 251, 0.2);
+}
+.btn-primary:hover {
+  background: var(--color-accent-hover);
+  box-shadow: 0 4px 12px rgba(75, 107, 251, 0.3);
+  transform: translateY(-1px);
+}
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.card-modern {
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  box-shadow: var(--shadow-card);
+  transition: box-shadow 0.2s ease;
+}
+.card-modern:hover {
+  box-shadow: var(--shadow-elevated);
+}
+
+.info-box {
+  background: var(--color-shell);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.theme-transition {
+  transition-property: color, background-color, border-color, box-shadow;
+  transition-timing-function: cubic-bezier(.4, 0, .2, 1);
+  transition-duration: .15s;
+}
+
+/* Dashboard grid */
 .grid-kpis {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1rem;
-}
-
-/* WearOcean theme transition */
-.theme-transition {
-  transition: all 0.2s ease-in-out;
+  gap: 16px;
 }

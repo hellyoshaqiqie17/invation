@@ -15,25 +15,25 @@ export default function Footer() {
           </div>
           <div>
             <span className="font-extrabold text-sm tracking-tight text-white block">PT SMN SmartGreen Transformation</span>
-            <span className="text-[10px] text-slate-400 font-mono">Industrial Problem Solving Innovation 5.0 Case Study Solution</span>
+            <span className="text-xs text-slate-400">Platform Terintegrasi Manufaktur Cerdas & Hijau</span>
           </div>
         </div>
 
         {/* Links */}
         <div className="flex items-center gap-6 text-slate-400">
-          <Link href="/admin/dashboard" className="hover:text-emerald-400 transition-colors flex items-center gap-1">
-            <span>Buka Dashboard ESG Control Tower</span>
+          <Link href="/admin/dashboard" className="hover:text-emerald-400 transition-colors flex items-center gap-1 font-medium">
+            <span>Buka SMN Control Tower</span>
             <ArrowUpRight className="w-3.5 h-3.5" />
           </Link>
-          <span>|</span>
-          <span className="font-mono text-[11px]">CAPEX Ceiling: Rp8B</span>
-          <span>|</span>
-          <span className="font-mono text-[11px]">Social Min: Rp1.2B (15%)</span>
+          <span>•</span>
+          <span>CAPEX Ceiling: <strong className="font-mono text-slate-200">Rp 8.0 M</strong></span>
+          <span>•</span>
+          <span>Porsi Sosial: <strong className="font-mono text-slate-200">Rp 1.6 M (20%)</strong></span>
         </div>
 
         {/* Right copyright */}
-        <div className="text-[10px] text-slate-500 font-mono">
-          © 2026 PT Sinergi Manufaktur Nusantara — Interactive Consulting Presentation
+        <div className="text-xs text-slate-500">
+          © 2026 PT Sinergi Manufaktur Nusantara
         </div>
       </div>
     </footer>

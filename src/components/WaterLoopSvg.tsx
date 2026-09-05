@@ -11,8 +11,9 @@ export default function WaterLoopSvg() {
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-100 pb-6">
         <div>
-          <span className="text-xs font-mono font-bold text-emerald-600 uppercase tracking-widest bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
-            SISTEM REKAYASA LINGKUNGAN
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-emerald-50 border border-emerald-200 text-xs font-medium text-emerald-800">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+            Rekayasa Lingkungan Sirkular
           </span>
           <h3 className="text-2xl font-extrabold text-slate-900 mt-2">
             Make Every Watt, Drop, and Material Count.
@@ -26,16 +27,16 @@ export default function WaterLoopSvg() {
         <div className="flex items-center gap-1.5 bg-slate-100 p-1.5 rounded-xl border border-slate-200">
           <button
             onClick={() => setViewMode("before")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-              viewMode === "before" ? "bg-amber-500 text-slate-950 shadow" : "text-slate-600 hover:text-slate-900"
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+              viewMode === "before" ? "bg-amber-500 text-slate-950 shadow-xs" : "text-slate-600 hover:text-slate-900"
             }`}
           >
             Kondisi Baseline (Before)
           </button>
           <button
             onClick={() => setViewMode("after")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-              viewMode === "after" ? "bg-emerald-600 text-white shadow" : "text-slate-600 hover:text-slate-900"
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+              viewMode === "after" ? "bg-emerald-600 text-white shadow-xs" : "text-slate-600 hover:text-slate-900"
             }`}
           >
             Smart & Green Loop (After)
@@ -49,35 +50,35 @@ export default function WaterLoopSvg() {
         {viewMode === "before" ? (
           /* BEFORE DIAGRAM: Linear groundwater depletion & community stress */
           <div className="space-y-6">
-            <div className="flex items-center justify-between text-xs font-mono text-amber-400 border-b border-slate-800 pb-3">
-              <span className="font-bold flex items-center gap-2">
+            <div className="flex items-center justify-between text-xs text-amber-400 border-b border-slate-800 pb-3">
+              <span className="font-semibold flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 text-amber-500" />
-                BASELINE: ALUR AIR LINIER (PEMBOROSAN AIR TANAH)
+                Baseline: Alur Air Linier (Pemborosan Air Tanah)
               </span>
               <span>100% Groundwater Withdrawal</span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 text-center items-center my-6">
               <div className="bg-slate-800 p-4 rounded-xl border border-amber-500/50">
-                <span className="text-[10px] font-mono text-amber-400 block">SUMBER AIR</span>
+                <span className="text-xs text-amber-400 block font-medium">Sumber Air</span>
                 <span className="text-sm font-bold text-slate-100 mt-1 block">Air Tanah (Groundwater)</span>
-                <span className="text-[10px] text-amber-400 mt-1 block font-mono">Boros 100% Air Sumur</span>
+                <span className="text-xs text-amber-400/80 mt-1 block">Boros 100% Air Sumur</span>
               </div>
 
               <ArrowRight className="hidden sm:block w-6 h-6 text-slate-500 mx-auto" />
 
               <div className="bg-slate-800 p-4 rounded-xl border border-slate-700">
-                <span className="text-[10px] font-mono text-slate-400 block">PENGGUNAAN PABRIK</span>
+                <span className="text-xs text-slate-400 block font-medium">Penggunaan Pabrik</span>
                 <span className="text-sm font-bold text-slate-100 mt-1 block">Cooling System (Mesin 20)</span>
-                <span className="text-[10px] text-slate-400 mt-1 block">Sekali Pakai (Once Through)</span>
+                <span className="text-xs text-slate-400 mt-1 block">Sekali Pakai (Once Through)</span>
               </div>
 
               <ArrowRight className="hidden sm:block w-6 h-6 text-slate-500 mx-auto" />
 
               <div className="bg-red-950/60 p-4 rounded-xl border border-red-500/80">
-                <span className="text-[10px] font-mono text-red-400 block">DAMPAK LINGKUNGAN</span>
+                <span className="text-xs text-red-400 block font-medium">Dampak Lingkungan</span>
                 <span className="text-sm font-bold text-red-200 mt-1 block">Sumur Warga Kering</span>
-                <span className="text-[10px] text-red-400 mt-1 block font-mono">Konflik Sosial Warga Pesisir</span>
+                <span className="text-xs text-red-400/80 mt-1 block">Konflik Sosial Warga Pesisir</span>
               </div>
             </div>
 
@@ -88,10 +89,10 @@ export default function WaterLoopSvg() {
         ) : (
           /* AFTER DIAGRAM: Circular Water Loop with Treatment & Sensor Monitoring */
           <div className="space-y-6">
-            <div className="flex items-center justify-between text-xs font-mono text-emerald-400 border-b border-slate-800 pb-3">
-              <span className="font-bold flex items-center gap-2">
+            <div className="flex items-center justify-between text-xs text-emerald-400 border-b border-slate-800 pb-3">
+              <span className="font-semibold flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-emerald-400" />
-                SMART & GREEN: CIRCULAR CLOSED WATER LOOP
+                Smart & Green: Circular Closed Water Loop
               </span>
               <span>Hingga 64% Penghematan Air Tanah</span>
             </div>
@@ -136,17 +137,17 @@ export default function WaterLoopSvg() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-              <div className="bg-slate-800 p-3 rounded-xl border border-slate-700">
-                <span className="text-[10px] text-slate-400 block font-mono">REDUKSI AIR TANAH</span>
-                <span className="text-sm font-bold text-emerald-400">Turun 4200 m³/bulan</span>
+              <div className="bg-slate-800 p-3.5 rounded-xl border border-slate-700">
+                <span className="text-xs text-slate-400 block font-medium">Reduksi Air Tanah</span>
+                <span className="text-sm font-bold text-emerald-400 mt-1 block">Turun 4.200 m³/bulan</span>
               </div>
-              <div className="bg-slate-800 p-3 rounded-xl border border-slate-700">
-                <span className="text-[10px] text-slate-400 block font-mono">TINGKAT DAUR ULANG</span>
-                <span className="text-sm font-bold text-emerald-400">64% Water Recycled</span>
+              <div className="bg-slate-800 p-3.5 rounded-xl border border-slate-700">
+                <span className="text-xs text-slate-400 block font-medium">Tingkat Daur Ulang</span>
+                <span className="text-sm font-bold text-emerald-400 mt-1 block">64% Air Didaur Ulang</span>
               </div>
-              <div className="bg-slate-800 p-3 rounded-xl border border-slate-700">
-                <span className="text-[10px] text-slate-400 block font-mono">HUBUNGAN KEMASYARAKATAN</span>
-                <span className="text-sm font-bold text-emerald-400">Konflik Air Sumur 0%</span>
+              <div className="bg-slate-800 p-3.5 rounded-xl border border-slate-700">
+                <span className="text-xs text-slate-400 block font-medium">Hubungan Kemasyarakatan</span>
+                <span className="text-sm font-bold text-emerald-400 mt-1 block">0 Konflik Sumur Warga</span>
               </div>
             </div>
           </div>

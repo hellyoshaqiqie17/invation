@@ -1,326 +1,576 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import { simulator, MachineData } from "@/lib/mockData";
+import {
+  simulator,
+  MachineData,
+  WaterLoopData,
+  EnergyLoopData,
+  ESGScorecard,
+  RoleType,
+} from "@/lib/mockData";
 import Link from "next/link";
 
-export default function DashboardHome() {
+export default function ControlTowerDashboard() {
   const [machines, setMachines] = useState<MachineData[]>([]);
-  const [selectedMachineId, setSelectedMachineId] = useState<string | null>("M03");
-  
-  const [searchQuery, setSearchQuery] = useState("");
-  const [presenceFilter, setPresenceFilter] = useState<"all" | "line-1" | "line-2" | "warning">("all");
+  const [water, setWater] = useState<WaterLoopData>(simulator.getWaterLoop());
+  const [energy, setEnergy] = useState<EnergyLoopData>(simulator.getEnergyLoop());
+  const [esg, setEsg] = useState<ESGScorecard>(simulator.getESGScorecard());
+  const [currentRole, setCurrentRole] = useState<RoleType>(simulator.getCurrentRole());
 
   useEffect(() => {
-    const updateData = () => {
-      const allMachines = simulator.getMachines();
-      setMachines([...allMachines]);
-
-      if (allMachines.length > 0 && !selectedMachineId) {
-        setSelectedMachineId(allMachines[0].id);
-      }
+    const update = () => {
+      setMachines([...simulator.getMachines()]);
+      setWater({ ...simulator.getWaterLoop() });
+      setEnergy({ ...simulator.getEnergyLoop() });
+      setEsg({ ...simulator.getESGScorecard() });
+      setCurrentRole(simulator.getCurrentRole());
     };
+    update();
+    return simulator.subscribe(update);
+  }, []);
 
-    updateData();
-    return simulator.subscribe(updateData);
-  }, [selectedMachineId]);
-
-  // Filters for machine list
-  const filteredMachines = useMemo(() => {
-    return machines.filter((m) => {
-      const matchesSearch = m.name.toLowerCase().includes(searchQuery.toLowerCase()) || m.id.toLowerCase().includes(searchQuery.toLowerCase());
-      
-      let matchesFilter = true;
-      if (presenceFilter === "line-1") {
-        matchesFilter = m.line === "Line 1";
-      } else if (presenceFilter === "line-2") {
-        matchesFilter = m.line === "Line 2";
-      } else if (presenceFilter === "warning") {
-        matchesFilter = m.status !== "normal";
-      }
-
-      return matchesSearch && matchesFilter;
-    });
-  }, [machines, searchQuery, presenceFilter]);
-
-  const selectedMachine = machines.find((m) => m.id === selectedMachineId);
-
-  // Compute KPI Statistics
-  const total = machines.length;
-  const activeOperating = machines.filter(m => m.state === "RUNNING").length;
-  const optimalCount = machines.filter(m => m.status === "normal").length;
-  const anomalyCount = machines.filter(m => m.status !== "normal").length;
+  // Compute production & fleet metrics
+  const totalMachines = machines.length;
+  const runningMachines = machines.filter((m) => m.state === "RUNNING").length;
+  const warningMachines = machines.filter((m) => m.status === "warning");
+  const criticalMachines = machines.filter((m) => m.status === "critical");
+  const atRiskCount = warningMachines.length + criticalMachines.length;
+  const avgHealth = machines.length
+    ? Math.round(machines.reduce((acc, m) => acc + m.healthScore, 0) / machines.length)
+    : 0;
 
   return (
-    <div className="space-y-6 font-sans text-slate-900">
-      {/* Page Header matching WearOcean */}
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Selamat Datang Kembali 👋</h1>
-        <p className="text-sm text-slate-500 mt-1">Berikut adalah aktivitas armada mesin dan lini produksi Anda hari ini.</p>
+    <div className="space-y-8 font-sans text-slate-900 pb-12">
+      
+      {/* Header Banner */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-slate-200 pb-5">
+        <div>
+          <div className="flex items-center gap-2 mb-1.5">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 border border-blue-100 text-xs font-semibold text-[#4B6BFB]">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#4B6BFB]"></span>
+              SMN Control Tower
+            </span>
+            <span className="text-xs text-slate-300">•</span>
+            <span className="text-xs text-slate-500 font-medium">Real-Time Telemetry</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+            Operational Control Tower
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+            Platform komando terpadu untuk monitoring manufaktur cerdas, sirkularitas ESG, dan kesiapan tenaga kerja.
+          </p>
+        </div>
+
+        {/* Role Highlight Chip */}
+        <div className="flex items-center gap-3 bg-white border border-slate-200 rounded-2xl px-4 py-2.5 shadow-xs">
+          <div className="h-8 w-8 rounded-lg bg-[#EEF2FF] text-[#4B6BFB] flex items-center justify-center font-bold text-xs">
+            {currentRole.slice(0, 2)}
+          </div>
+          <div>
+            <span className="text-[11px] text-slate-400 font-medium block">Active Workspace</span>
+            <span className="text-xs font-semibold text-slate-800">{currentRole} View</span>
+          </div>
+        </div>
       </div>
 
-      {/* KPI Cards Grid matching WearOcean */}
-      <div className="grid-kpis">
-        {[
-          { label: "Total Terdaftar", value: `${total} Unit`, icon: "settings_input_component", iconBg: "bg-blue-50", iconColor: "text-blue-500" },
-          { label: "Sedang Beroperasi", value: `${activeOperating} Unit`, icon: "precision_manufacturing", iconBg: "bg-indigo-50", iconColor: "text-indigo-500" },
-          { label: "Normal & Optimal", value: `${optimalCount} Unit`, icon: "check_circle", iconBg: "bg-emerald-50", iconColor: "text-emerald-500" },
-          { 
-            label: "Kasus Anomali Aktif", 
-            value: `${anomalyCount} Unit`, 
-            icon: "warning", 
-            iconBg: anomalyCount > 0 ? "bg-red-50" : "bg-slate-50",
-            iconColor: anomalyCount > 0 ? "text-red-500" : "text-slate-400"
-          }
-        ].map((k, i) => (
-          <div key={i} className="bg-white border border-slate-200 rounded-2xl p-5 flex items-center justify-between shadow-sm" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+      {/* Priority Action Board */}
+      <div className="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-xs space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-100 pb-3">
+          <div className="flex items-center gap-2.5">
+            <div className="h-8 w-8 rounded-xl bg-red-50 text-red-600 flex items-center justify-center">
+              <span className="material-icons text-base">priority_high</span>
+            </div>
             <div>
-              <span className="text-xs text-slate-500 font-medium">{k.label}</span>
-              <div className="text-2xl font-bold text-slate-900 mt-1">{k.value}</div>
-            </div>
-            <div className={`h-12 w-12 rounded-full flex items-center justify-center ${k.iconBg}`}>
-              <span className={`material-icons text-xl ${k.iconColor}`}>{k.icon}</span>
+              <h2 className="text-sm sm:text-base font-bold text-slate-900">Priority Action Board</h2>
+              <p className="text-xs text-slate-500">3 intervensi operasional mendesak yang memerlukan tindakan cepat lintas divisi.</p>
             </div>
           </div>
-        ))}
+          <span className="text-xs bg-slate-50 px-3 py-1 rounded-full border border-slate-200 text-slate-600 font-medium self-start sm:self-auto">
+            {atRiskCount} Machine Anomalies • 1 Water Alert • 1 Workforce Gate
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+          {/* Card 1: Machine Critical M13 */}
+          <div className="bg-slate-50/50 border border-red-200 rounded-2xl p-4 flex flex-col justify-between space-y-3">
+            <div>
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold bg-red-100 text-red-700 px-2 py-0.5 rounded-md">
+                  Critical • Machine M13
+                </span>
+                <span className="text-xs text-slate-400 font-medium">Line 2</span>
+              </div>
+              <h4 className="text-xs font-bold text-slate-900 mt-2">Vibration Spike (8.9 mm/s) & Thermal Alert</h4>
+              <p className="text-[11px] text-slate-600 mt-1 leading-relaxed">
+                Unit Secondary Stamping M13 berisiko bearing lockup dalam &lt; 48 jam jika tidak diintervensi.
+              </p>
+            </div>
+            <Link
+              href="/admin/machines"
+              className="inline-flex items-center justify-center gap-1 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold py-2 px-3 rounded-xl transition-all shadow-xs"
+            >
+              <span>Open Sense & Predict</span>
+              <span className="material-icons text-sm">arrow_forward</span>
+            </Link>
+          </div>
+
+          {/* Card 2: Water Loop Alert */}
+          <div className="bg-slate-50/50 border border-amber-200 rounded-2xl p-4 flex flex-col justify-between space-y-3">
+            <div>
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-md">
+                  Warning • Cooling Water Loop
+                </span>
+                <span className="text-xs text-slate-400 font-medium">Pump M17</span>
+              </div>
+              <h4 className="text-xs font-bold text-slate-900 mt-2">Circulation Flow Rate Anomaly</h4>
+              <p className="text-[11px] text-slate-600 mt-1 leading-relaxed">
+                Debit pendingin Line 02 berkurang -14.2 L/menit. Daur ulang air 64% tetap berjalan.
+              </p>
+            </div>
+            <Link
+              href="/admin/esg?tab=WATER"
+              className="inline-flex items-center justify-center gap-1 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold py-2 px-3 rounded-xl transition-all shadow-xs"
+            >
+              <span>Inspect Cooling Loop</span>
+              <span className="material-icons text-sm">arrow_forward</span>
+            </Link>
+          </div>
+
+          {/* Card 3: Workforce Human Readiness Gate */}
+          <div className="bg-slate-50/50 border border-indigo-200 rounded-2xl p-4 flex flex-col justify-between space-y-3">
+            <div>
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold bg-[#EEF2FF] text-[#4B6BFB] px-2 py-0.5 rounded-md">
+                  Human Readiness Gate
+                </span>
+                <span className="text-xs text-slate-400 font-medium">Line 2</span>
+              </div>
+              <h4 className="text-xs font-bold text-slate-900 mt-2">Predictive Go-Live Blocked (4 Technicians)</h4>
+              <p className="text-[11px] text-slate-600 mt-1 leading-relaxed">
+                Hardware IoT siap, namun modul sertifikasi getaran belum selesai. Safety gate aktif.
+              </p>
+            </div>
+            <Link
+              href="/admin/workforce?section=gatekeeper"
+              className="inline-flex items-center justify-center gap-1 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold py-2 px-3 rounded-xl transition-all shadow-xs"
+            >
+              <span>Resolve Workforce Gate</span>
+              <span className="material-icons text-sm">arrow_forward</span>
+            </Link>
+          </div>
+        </div>
       </div>
 
-      {/* Live Presence & Detail Panel Split Layout matching WearOcean */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-0">
+      {/* CORE KPI SUMMARY GRID */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         
-        {/* Left Side: Machine List Card */}
-        <div className="lg:col-span-7 flex flex-col bg-white border border-slate-200 rounded-2xl overflow-hidden h-[540px] shadow-sm" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
-          <div className="p-4 border-b border-slate-100 space-y-3">
-            <div className="flex items-center justify-between">
-              <h2 className="text-sm font-semibold text-slate-900 flex items-center gap-2">
-                <span className="material-icons text-blue-500 text-lg">precision_manufacturing</span>
-                Telemetri Langsung (20 Mesin)
-              </h2>
-              <span className="text-xs text-slate-500">{filteredMachines.length} unit</span>
-            </div>
-
-            {/* Search Box */}
-            <div className="relative">
-              <span className="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">search</span>
-              <input
-                type="text"
-                placeholder="Cari mesin..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-3 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-sm placeholder:text-slate-400 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-50 transition-all"
-              />
-            </div>
-
-            {/* Filter Tabs */}
-            <div className="bg-slate-100 p-1 rounded-xl flex gap-1 w-fit">
-              <button
-                onClick={() => setPresenceFilter("all")}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                  presenceFilter === "all" ? "bg-white text-slate-900 shadow-sm" : "text-slate-600"
-                }`}
-              >
-                Semua
-              </button>
-              <button
-                onClick={() => setPresenceFilter("line-1")}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                  presenceFilter === "line-1" ? "bg-white text-slate-900 shadow-sm" : "text-slate-600"
-                }`}
-              >
-                Lini 1
-              </button>
-              <button
-                onClick={() => setPresenceFilter("line-2")}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                  presenceFilter === "line-2" ? "bg-white text-slate-900 shadow-sm" : "text-slate-600"
-                }`}
-              >
-                Lini 2
-              </button>
-              <button
-                onClick={() => setPresenceFilter("warning")}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                  presenceFilter === "warning" ? "bg-white text-slate-900 shadow-sm" : "text-slate-600"
-                }`}
-              >
-                Anomali
-              </button>
-            </div>
+        {/* Production Status */}
+        <div className="bg-white border border-slate-200 rounded-2xl p-4.5 shadow-xs flex flex-col justify-between">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-slate-500">Active Fleet Status</span>
+            <span className="h-8 w-8 rounded-xl bg-[#EEF2FF] text-[#4B6BFB] flex items-center justify-center">
+              <span className="material-icons text-base">precision_manufacturing</span>
+            </span>
           </div>
-
-          {/* Scrollable Machine List */}
-          <div className="flex-1 overflow-y-auto">
-            {filteredMachines.length === 0 ? (
-              <div className="text-center py-12 text-slate-500 text-sm">Tidak ada mesin yang cocok.</div>
-            ) : (
-              filteredMachines.map((m) => {
-                const isSelected = selectedMachineId === m.id;
-
-                return (
-                  <div
-                    key={m.id}
-                    onClick={() => setSelectedMachineId(m.id)}
-                    className={`flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-slate-50 transition-all border-b border-slate-50 ${
-                      isSelected ? "bg-blue-50/60 border-l-[3px] border-l-blue-500" : "border-l-[3px] border-l-transparent"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className="relative">
-                        <div className="h-10 w-10 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600">
-                          <span className="material-icons text-lg">settings_suggest</span>
-                        </div>
-                        <span className={`absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-white ${
-                          m.status === "critical" ? "bg-red-500 animate-pulse" :
-                          m.status === "warning" ? "bg-amber-500" : "bg-emerald-500"
-                        }`}></span>
-                      </div>
-                      <div className="min-w-0">
-                        <div className="text-sm font-semibold text-slate-900 truncate">{m.id} - {m.name}</div>
-                        <div className="text-xs text-slate-500 mt-0.5">
-                          {m.line} • {m.type}
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {/* Metrics */}
-                    <div className="text-right flex items-center gap-3">
-                      <div className="hidden sm:block text-right">
-                        <span className="text-[11px] text-slate-400 block">Vibrasi / Power</span>
-                        <span className="text-xs font-medium text-slate-900">
-                          {m.vibration} mm/s / {m.power} kW
-                        </span>
-                      </div>
-                      <span className="material-icons text-slate-300 text-lg">chevron_right</span>
-                    </div>
-                  </div>
-                );
-              })
-            )}
+          <div className="mt-3">
+            <div className="text-2xl font-extrabold text-slate-900">
+              {runningMachines} <span className="text-sm font-semibold text-slate-500">/ {totalMachines} Units</span>
+            </div>
+            <div className="flex items-center gap-1.5 text-[11px] text-emerald-600 font-semibold mt-1">
+              <span className="h-2 w-2 rounded-full bg-emerald-500"></span>
+              <span>Line 1 Optimal • Line 2 Restricted</span>
+            </div>
           </div>
         </div>
 
-        {/* Right Side: Detail Panel matching WearOcean */}
-        <div className="lg:col-span-5 bg-white border border-slate-200 rounded-2xl p-6 h-[540px] flex flex-col justify-between overflow-y-auto shadow-sm" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
-          {selectedMachine ? (
-            <div className="space-y-5">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-                <h3 className="text-sm font-semibold text-slate-900">Detail Telemetri Mesin</h3>
-                <span className="text-xs bg-slate-100 text-slate-600 px-2.5 py-1 rounded-lg font-mono font-medium">
-                  {selectedMachine.id}
+        {/* AI Machine Health Score */}
+        <div className="bg-white border border-slate-200 rounded-2xl p-4.5 shadow-xs flex flex-col justify-between">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-slate-500">Average Health Score</span>
+            <span className="h-8 w-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+              <span className="material-icons text-base">monitor_heart</span>
+            </span>
+          </div>
+          <div className="mt-3">
+            <div className="text-2xl font-extrabold text-slate-900">
+              {avgHealth}% <span className="text-xs font-bold text-amber-600">({atRiskCount} Anomalies)</span>
+            </div>
+            <div className="text-[11px] text-slate-500 mt-1">
+              ISO 10816 Predictive Monitoring
+            </div>
+          </div>
+        </div>
+
+        {/* Circular Water Recycling Rate */}
+        <div className="bg-white border border-slate-200 rounded-2xl p-4.5 shadow-xs flex flex-col justify-between">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-slate-500">Closed-Loop Water Recovery</span>
+            <span className="h-8 w-8 rounded-xl bg-cyan-50 text-cyan-600 flex items-center justify-center">
+              <span className="material-icons text-base">water_drop</span>
+            </span>
+          </div>
+          <div className="mt-3">
+            <div className="text-2xl font-extrabold text-cyan-700">
+              {water.recyclingRatePercent}% <span className="text-xs font-normal text-slate-400">Recovery Rate</span>
+            </div>
+            <div className="text-[11px] text-emerald-600 font-semibold mt-1">
+              Saving Rp 150 Jt / month
+            </div>
+          </div>
+        </div>
+
+        {/* Energy & Carbon Footprint */}
+        <div className="bg-white border border-slate-200 rounded-2xl p-4.5 shadow-xs flex flex-col justify-between">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-slate-500">Active Power & Energy Load</span>
+            <span className="h-8 w-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+              <span className="material-icons text-base">bolt</span>
+            </span>
+          </div>
+          <div className="mt-3">
+            <div className="text-2xl font-extrabold text-slate-900">
+              {energy.currentPowerKw} <span className="text-xs font-semibold text-slate-500">kW</span>
+            </div>
+            <div className="text-[11px] text-slate-500 mt-1">
+              Idle Loss: <strong className="text-amber-600">{energy.idleLossKw} kW</strong> (~12.6%)
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      {/* DOMAIN SECTIONS: PRODUCTION, AI & MAINTENANCE, CIRCULAR LOOPS, ESG & WORKFORCE */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        {/* LEFT COLUMN: Production & Machine Live Telemetry (7 Cols) */}
+        <div className="lg:col-span-7 space-y-6">
+          
+          {/* PRODUCTION & FLEET OVERVIEW CARD */}
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-xs space-y-5">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+              <div>
+                <span className="text-xs font-semibold text-[#4B6BFB] block">Lini Produksi & Mesin</span>
+                <h3 className="text-base font-bold text-slate-900 mt-0.5">Status 20 Mesin Lini 1 & Lini 2</h3>
+              </div>
+              <Link
+                href="/admin/machines"
+                className="text-xs font-semibold text-[#4B6BFB] hover:text-[#3B5BEB] flex items-center gap-1"
+              >
+                <span>Lihat Semua Mesin</span>
+                <span className="material-icons text-xs">arrow_forward</span>
+              </Link>
+            </div>
+
+            {/* Production Lines Breakdown */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-800">Lini 1 (Stamping & Machining)</span>
+                  <span className="text-xs font-medium bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-md font-sans">
+                    95% Sehat
+                  </span>
+                </div>
+                <div className="text-xs text-slate-600 space-y-1">
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Unit Aktif:</span>
+                    <span className="font-semibold text-slate-900">10 / 10 Unit</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Beban Daya:</span>
+                    <span className="font-semibold text-slate-900 font-mono">{energy.line1ConsumptionKw} kW</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Anomali:</span>
+                    <span className="font-semibold text-amber-600">Unit M03 (Warning)</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-800">Lini 2 (Finishing & Assembly)</span>
+                  <span className="text-xs font-medium bg-red-100 text-red-800 px-2 py-0.5 rounded-md font-sans">
+                    Kritis (M13 Henti)
+                  </span>
+                </div>
+                <div className="text-xs text-slate-600 space-y-1">
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Unit Aktif:</span>
+                    <span className="font-semibold text-slate-900">9 / 10 Unit (M13 STOP)</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Beban Daya:</span>
+                    <span className="font-semibold text-slate-900 font-mono">{energy.line2ConsumptionKw} kW</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Anomali:</span>
+                    <span className="font-semibold text-red-600">Unit M13 (STOP 58 Jam)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Fleet Telemetry Table */}
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs font-sans">
+                <thead>
+                  <tr className="border-b border-slate-100 text-slate-400 text-xs font-medium">
+                    <th className="pb-2.5">Mesin</th>
+                    <th className="pb-2.5">Lini</th>
+                    <th className="pb-2.5">Vibrasi</th>
+                    <th className="pb-2.5">Suhu</th>
+                    <th className="pb-2.5">Health</th>
+                    <th className="pb-2.5">Status</th>
+                    <th className="pb-2.5 text-right">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {machines.slice(0, 6).map((m) => (
+                    <tr key={m.id} className="hover:bg-slate-50 transition-colors">
+                      <td className="py-2.5 font-bold text-slate-900">
+                        {m.id} <span className="text-slate-500 font-normal">({m.type})</span>
+                      </td>
+                      <td className="py-2.5 text-slate-600">{m.line}</td>
+                      <td className="py-2.5 font-mono">
+                        <span className={m.vibration > 4.5 ? "text-amber-600 font-bold" : "text-slate-700"}>
+                          {m.vibration} mm/s
+                        </span>
+                      </td>
+                      <td className="py-2.5 font-mono">
+                        <span className={m.temp > 70 ? "text-red-500 font-bold" : "text-slate-700"}>
+                          {m.temp} °C
+                        </span>
+                      </td>
+                      <td className="py-2.5 font-mono font-bold text-emerald-700">{m.healthScore}%</td>
+                      <td className="py-2.5">
+                        <span
+                          className={`text-xs font-medium px-2 py-0.5 rounded-md capitalize ${
+                            m.status === "critical"
+                              ? "bg-red-100 text-red-700"
+                              : m.status === "warning"
+                              ? "bg-amber-100 text-amber-800"
+                              : "bg-emerald-100 text-emerald-800"
+                          }`}
+                        >
+                          {m.status}
+                        </span>
+                      </td>
+                      <td className="py-2.5 text-right">
+                        <Link
+                          href="/admin/machines"
+                          className="text-[11px] font-semibold text-[#4B6BFB] hover:text-[#3B5BEB]"
+                        >
+                          Detail →
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* CIRCULAR RESOURCE MANAGEMENT (WATER, WASTE, ENERGY LOOPS) */}
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-xs space-y-5">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+              <div>
+                <span className="text-xs font-semibold text-cyan-700 block">Sirkulasi Sumber Daya Sirkular</span>
+                <h3 className="text-base font-bold text-slate-900 mt-0.5">Water, Waste & Energy Closed-Loops</h3>
+              </div>
+              <Link
+                href="/admin/esg"
+                className="text-xs font-semibold text-cyan-700 hover:text-cyan-800 flex items-center gap-1"
+              >
+                <span>Buka Close The Loop</span>
+                <span className="material-icons text-xs">arrow_forward</span>
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+              
+              {/* Water Card */}
+              <div className="bg-cyan-50/50 border border-cyan-200/80 rounded-2xl p-4 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold text-cyan-900">Sirkulasi Air</span>
+                  <span className="material-icons text-cyan-600 text-base">water_drop</span>
+                </div>
+                <div className="text-2xl font-bold font-mono text-cyan-950">64%</div>
+                <p className="text-[11px] text-cyan-800 leading-tight">
+                  Tingkat daur ulang air pendingin mesin loop tertutup.
+                </p>
+                <div className="pt-2 border-t border-cyan-200/60 text-[10px] text-amber-800 font-semibold">
+                  ⚠️ Peringatan aliran pada pompa M17
+                </div>
+              </div>
+
+              {/* Waste Card */}
+              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold text-slate-800">Manajemen Limbah</span>
+                  <span className="material-icons text-slate-600 text-base">delete_outline</span>
+                </div>
+                <div className="text-2xl font-bold font-mono text-slate-900">140 kg</div>
+                <p className="text-[11px] text-slate-600 leading-tight">
+                  Limbah B3 oli terkontaminasi tertampung aman di kontainer berizin.
+                </p>
+                <div className="pt-2 border-t border-slate-200 text-[10px] text-[#4B6BFB] font-semibold">
+                  ✓ Manifest PPLI terjadwal
+                </div>
+              </div>
+
+              {/* Energy Card */}
+              <div className="bg-amber-50/50 border border-amber-200/80 rounded-2xl p-4 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold text-amber-900">Efisiensi Energi</span>
+                  <span className="material-icons text-amber-600 text-base">bolt</span>
+                </div>
+                <div className="text-2xl font-bold font-mono text-amber-950">48.2 kW</div>
+                <p className="text-[11px] text-amber-800 leading-tight">
+                  Daya terbuang pada mesin idle. Potensi hemat Rp1.85jt/hari.
+                </p>
+                <div className="pt-2 border-t border-amber-200/60 text-[10px] text-amber-800 font-semibold">
+                  ⚠️ Auto-standby cut-off disarankan
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+        {/* RIGHT COLUMN: ESG, Green Batch Passport & Workforce (5 Cols) */}
+        <div className="lg:col-span-5 space-y-6">
+          
+          {/* GREEN BATCH PASSPORT & TRACEABILITY SNAPSHOT */}
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-xs space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div>
+                <span className="text-xs font-semibold text-emerald-700 block">Ketertelusuran & Integritas Produk</span>
+                <h3 className="text-sm font-bold text-slate-900">Green Batch Passport & Traceability</h3>
+              </div>
+              <Link
+                href="/admin/green-batch"
+                className="text-xs font-semibold text-emerald-700 hover:text-emerald-800"
+              >
+                Lihat Paspor →
+              </Link>
+            </div>
+
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-xs text-slate-500 font-medium block">Batch Terakhir Diverifikasi</span>
+                  <span className="text-xs font-bold text-slate-900 font-mono">SMN-2026-00124</span>
+                </div>
+                <span className="text-xs font-semibold bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-md">
+                  Verified A+
                 </span>
               </div>
 
-              {/* Machine Header Profile */}
-              <div className="flex items-center gap-3">
-                <div className="h-12 w-12 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-[#4B6BFB]">
-                  <span className="material-icons text-2xl">precision_manufacturing</span>
+              <div className="grid grid-cols-3 gap-2 text-center text-xs pt-1">
+                <div className="bg-white p-2.5 rounded-xl border border-slate-100">
+                  <span className="text-[11px] text-slate-500 font-medium block">Karbon</span>
+                  <span className="font-bold text-slate-800 font-mono text-xs">18.5 kg</span>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <h4 className="text-sm font-bold text-slate-900 truncate">{selectedMachine.name}</h4>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${
-                      selectedMachine.status === "critical" ? "bg-red-50 text-red-600 animate-pulse" :
-                      selectedMachine.status === "warning" ? "bg-amber-50 text-amber-600" : "bg-emerald-50 text-emerald-600"
-                    }`}>
-                      {selectedMachine.status.toUpperCase()}
-                    </span>
-
-                    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full flex items-center gap-1 ${
-                      selectedMachine.status !== "normal" ? "bg-red-50 text-red-600" : "bg-blue-50 text-[#4B6BFB]"
-                    }`}>
-                      <span className="material-icons text-[10px]">psychology</span>
-                      AI: {selectedMachine.status !== "normal" ? "Risiko Tinggi" : "Risiko Rendah"}
-                    </span>
-                  </div>
+                <div className="bg-white p-2.5 rounded-xl border border-slate-100">
+                  <span className="text-[11px] text-slate-500 font-medium block">Air Tanah</span>
+                  <span className="font-bold text-emerald-600 font-mono text-xs">0 L</span>
+                </div>
+                <div className="bg-white p-2.5 rounded-xl border border-slate-100">
+                  <span className="text-[11px] text-slate-500 font-medium block">Kualitas</span>
+                  <span className="font-bold text-[#4B6BFB] font-mono text-xs">100% Pass</span>
                 </div>
               </div>
 
-              {/* Machine Status Grid matching WearOcean */}
-              <div className="grid grid-cols-2 gap-2 text-xs bg-slate-50 border border-slate-200 rounded-xl p-3.5">
-                <div className="col-span-2 text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">STATUS MESIN & INTERVENSI</div>
-                <div>
-                  <span className="text-slate-400 block text-[10px]">Vibrasi Bearing</span>
-                  <span className={`font-semibold text-sm ${selectedMachine.vibration > 4.5 ? "text-amber-600 font-bold" : "text-slate-800"}`}>
-                    {selectedMachine.vibration} mm/s
-                  </span>
-                </div>
-                <div>
-                  <span className="text-slate-400 block text-[10px]">Suhu Motor</span>
-                  <span className={`font-semibold text-sm ${selectedMachine.temp > 70 ? "text-red-500 font-bold" : "text-slate-800"}`}>
-                    {selectedMachine.temp} °C
-                  </span>
-                </div>
-                <div>
-                  <span className="text-slate-400 block text-[10px]">Daya Listrik</span>
-                  <span className="font-semibold text-sm text-slate-800">
-                    {selectedMachine.power} kW
-                  </span>
-                </div>
-                <div>
-                  <span className="text-slate-400 block text-[10px]">Health Score</span>
-                  <span className={`font-semibold ${selectedMachine.healthScore < 60 ? "text-amber-600 font-bold" : "text-emerald-600"}`}>
-                    {selectedMachine.healthScore}%
-                  </span>
-                </div>
-                <div>
-                  <span className="text-slate-400 block text-[10px]">Downtime Bulanan</span>
-                  <span className="font-semibold text-slate-800">
-                    {selectedMachine.downtimeHours} Jam
-                  </span>
-                </div>
-                <div>
-                  <span className="text-slate-400 block text-[10px]">Status Daur Ulang</span>
-                  <span className="font-semibold text-blue-600">
-                    DAUR ULANG LOOP
-                  </span>
-                </div>
+              <p className="text-[11px] text-slate-500 leading-relaxed">
+                Bukti ketertelusuran rantai pasok dari PT Sinar Baja Utama hingga CNC M01 tercatat permanen dalam paspor digital.
+              </p>
+            </div>
+          </div>
+
+          {/* WORKFORCE JUST TRANSITION & READINESS GATE */}
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-xs space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div>
+                <span className="text-xs font-semibold text-indigo-700 block">Kesiapan Tenaga Kerja</span>
+                <h3 className="text-sm font-bold text-slate-900 mt-0.5">Grow with SMN & Readiness Gate</h3>
+              </div>
+              <Link
+                href="/admin/workforce"
+                className="text-xs font-semibold text-indigo-600 hover:text-indigo-700"
+              >
+                Kelola SDM →
+              </Link>
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-slate-600 font-medium">Kesiapan Keahlian Digital SDM</span>
+                <span className="font-bold text-slate-900 font-mono">114 / 120 Pekerja (95%)</span>
+              </div>
+              <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                <div className="bg-indigo-600 h-full rounded-full" style={{ width: "95%" }}></div>
               </div>
 
-              {/* Environmental Telemetry BME280 */}
-              <div className="grid grid-cols-3 gap-2 text-xs bg-slate-50 border border-slate-200 rounded-xl p-3">
-                <div className="col-span-3 text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Kondisi Lingkungan (BME280)</div>
-                <div>
-                  <span className="text-slate-400 block text-[9px]">Suhu Sekitar</span>
-                  <span className="font-semibold text-slate-700">29.2°C</span>
+              <div className="bg-amber-50 border border-amber-200/80 rounded-2xl p-3.5 space-y-2">
+                <div className="flex items-center justify-between text-xs font-bold text-amber-900">
+                  <span>Pintu Kesiapan Karyawan (Human Gate)</span>
+                  <span className="text-xs font-medium bg-amber-200/80 px-2 py-0.5 rounded-md">
+                    Hold Go-Live
+                  </span>
                 </div>
-                <div>
-                  <span className="text-slate-400 block text-[9px]">Kelembapan</span>
-                  <span className="font-semibold text-slate-700">76%</span>
-                </div>
-                <div>
-                  <span className="text-slate-400 block text-[9px]">Tekanan</span>
-                  <span className="font-semibold text-slate-700 text-[10px] font-mono">1011 hPa</span>
-                </div>
-              </div>
-
-              {/* Runtime & Energy Logs */}
-              <div className="grid grid-cols-2 gap-2 text-xs bg-slate-50 border border-slate-200 rounded-xl p-3.5">
-                <div className="col-span-2 text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Daya & Log Perjalanan</div>
-                <div>
-                  <span className="text-slate-400 block text-[10px]">Kapasitas Daya</span>
-                  <span className="font-semibold text-slate-800">87.75%</span>
-                </div>
-                <div>
-                  <span className="text-slate-400 block text-[10px]">Est. Waktu Aktif</span>
-                  <span className="font-semibold text-slate-800">~42.1 Jam</span>
-                </div>
+                <p className="text-[11px] text-amber-800 leading-snug">
+                  4 teknisi Lini 2 butuh penuntasan sertifikasi vibrasi 3-axis sebelum kontrol pengereman otomatis diaktifkan.
+                </p>
+                <Link
+                  href="/admin/workforce"
+                  className="inline-block text-[11px] font-bold text-amber-900 underline hover:text-amber-950"
+                >
+                  Selesaikan Pelatihan →
+                </Link>
               </div>
             </div>
-          ) : null}
+          </div>
 
-          {/* Action Link Button matching WearOcean */}
-          {selectedMachine && (
-            <Link
-              href="/admin/machines"
-              className="py-3 px-4 rounded-xl bg-[#4B6BFB] hover:bg-blue-600 text-sm font-semibold text-white text-center transition-all shadow-md shadow-blue-500/10 flex items-center justify-center gap-2 mt-4 cursor-pointer"
-            >
-              <span className="material-icons text-sm">explore</span>
-              Temukan di Skema Mesin
-            </Link>
-          )}
+          {/* FINANCIAL VALUE & ROI PREVIEW */}
+          <div className="bg-slate-900 text-white rounded-3xl p-6 shadow-sm space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div>
+                <span className="text-xs font-semibold text-emerald-400 block">Kelayakan Finansial & Nilai Bisnis</span>
+                <h3 className="text-sm font-bold text-white mt-0.5">Transformation Value</h3>
+              </div>
+              <Link
+                href="/admin/financials"
+                className="text-xs font-semibold text-emerald-400 hover:text-emerald-300"
+              >
+                Kalkulator ROI →
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 text-xs">
+              <div className="bg-slate-800/80 p-3 rounded-2xl border border-slate-700/80">
+                <span className="text-xs text-slate-400 font-medium block">Target Hemat OPEX</span>
+                <span className="text-lg font-bold text-emerald-400 font-mono">18.0%</span>
+                <span className="text-xs text-slate-400 block">Rp 2.88 Miliar/thn</span>
+              </div>
+              <div className="bg-slate-800/80 p-3 rounded-2xl border border-slate-700/80">
+                <span className="text-xs text-slate-400 font-medium block">Estimasi Payback</span>
+                <span className="text-lg font-bold text-white font-mono">2.78 Thn</span>
+                <span className="text-xs text-emerald-400 block">IRR ~23.5%</span>
+              </div>
+            </div>
+
+            <p className="text-[11px] text-slate-400 leading-relaxed">
+              "Innovation Must Pay for Itself." Efisiensi energi, daur ulang air, dan penurunan downtime membiayai sendiri modal transformasi digital.
+            </p>
+          </div>
+
         </div>
 
       </div>
+
     </div>
   );
 }
