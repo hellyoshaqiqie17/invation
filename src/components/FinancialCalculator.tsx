@@ -81,7 +81,7 @@ export default function FinancialCalculator() {
           <div className="bg-white p-3 rounded-xl border border-slate-200">
             <span className="text-xs font-semibold text-cyan-600 block">2. Efisiensi Operasional</span>
             <strong className="text-slate-900 block mt-0.5">Operasional Cerdas</strong>
-            <span className="text-[11px] text-slate-500">Vibrasi Prediktif & Daur Ulang Air 64%</span>
+            <span className="text-[11px] text-slate-500">Predictive Maintenance & 64% Water Loop</span>
           </div>
 
           <div className="bg-white p-3 rounded-xl border border-slate-200">
@@ -166,7 +166,7 @@ export default function FinancialCalculator() {
                 <span className="font-bold text-slate-900">Rp {wasteSavingsRpB} M</span>
               </div>
               <div className="bg-white p-2.5 rounded-xl border border-slate-200">
-                <span className="text-[10px] text-slate-400 block">4. Daur Ulang Air Loop</span>
+                <span className="text-[10px] text-slate-400 block">4. Closed-Loop Water Recovery</span>
                 <span className="font-bold text-slate-900">Rp {waterSavingsRpB} M</span>
               </div>
             </div>

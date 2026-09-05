@@ -163,7 +163,7 @@ export default function HeroVisualizer() {
           <div>
             <span className="text-slate-400 block text-[10px]">Air Tanah & Limbah B3</span>
             <span className="font-bold text-slate-200">
-              {stage === 0 ? "Pengambilan Air Berlebih" : stage === 1 ? "Sensor Flow Rate" : "Daur Ulang Air Loop Closed"}
+              {stage === 0 ? "Pengambilan Air Berlebih" : stage === 1 ? "Sensor Flow Rate" : "Closed-Loop Water Recovery"}
             </span>
           </div>
         </div>

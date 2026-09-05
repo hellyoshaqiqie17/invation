@@ -18,7 +18,7 @@ export default function GreenBatchPassportPage() {
 
   const handleExport = () => {
     setExportNotice(
-      `Paspor Digital untuk batch ${currentPassport.batchId} berhasil di-generate sebagai sertifikat audit PDF.`
+      `Digital Product Passport for batch ${currentPassport.batchId} has been successfully generated as an audit-ready PDF certificate.`
     );
     setTimeout(() => setExportNotice(null), 4000);
   };
@@ -167,7 +167,7 @@ export default function GreenBatchPassportPage() {
         {/* Footer info */}
         <div className="pt-4 flex flex-col sm:flex-row sm:items-center justify-between text-xs text-slate-400">
           <span>Digital Passport Hash: <strong className="font-mono text-slate-600">{currentPassport.qrHash}</strong></span>
-          <span className="mt-1 sm:mt-0 font-medium text-emerald-700">✓ Sesuai Standar Audit Ekspor Hijau ISO 14067</span>
+          <span className="mt-1 sm:mt-0 font-medium text-emerald-700">✓ ISO 14067 & CBAM Green Export Audit Standard Compliant</span>
         </div>
       </div>
 

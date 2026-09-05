@@ -454,7 +454,7 @@ export default function ControlTowerDashboard() {
                 href="/admin/green-batch"
                 className="text-xs font-semibold text-emerald-700 hover:text-emerald-800"
               >
-                Lihat Paspor →
+                View Green Passport →
               </Link>
             </div>
 
@@ -485,7 +485,7 @@ export default function ControlTowerDashboard() {
               </div>
 
               <p className="text-[11px] text-slate-500 leading-relaxed">
-                Bukti ketertelusuran rantai pasok dari PT Sinar Baja Utama hingga CNC M01 tercatat permanen dalam paspor digital.
+                Bukti ketertelusuran end-to-end supply chain dari PT Sinar Baja Utama hingga CNC M01 tercatat secara permanen dalam Green Batch Passport.
               </p>
             </div>
           </div>
@@ -501,7 +501,7 @@ export default function ControlTowerDashboard() {
                 href="/admin/workforce"
                 className="text-xs font-semibold text-indigo-600 hover:text-indigo-700"
               >
-                Kelola SDM →
+                Manage Workforce →
               </Link>
             </div>
 
@@ -516,7 +516,7 @@ export default function ControlTowerDashboard() {
 
               <div className="bg-amber-50 border border-amber-200/80 rounded-2xl p-3.5 space-y-2">
                 <div className="flex items-center justify-between text-xs font-bold text-amber-900">
-                  <span>Pintu Kesiapan Karyawan (Human Gate)</span>
+                  <span>Human Readiness Gate</span>
                   <span className="text-xs font-medium bg-amber-200/80 px-2 py-0.5 rounded-md">
                     Hold Go-Live
                   </span>
@@ -528,7 +528,7 @@ export default function ControlTowerDashboard() {
                   href="/admin/workforce"
                   className="inline-block text-[11px] font-bold text-amber-900 underline hover:text-amber-950"
                 >
-                  Selesaikan Pelatihan →
+                  Accelerate Training →
                 </Link>
               </div>
             </div>
